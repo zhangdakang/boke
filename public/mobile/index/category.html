@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <title>WeUI</title>
+    <link rel="stylesheet" href="/static/mobile/css/weui.css"/>
+</head>
+<body ontouchstart>
+<div class="page">
+    <div class="page__hd">
+        <h1 class="page__title">分类</h1>
+        <p class="page__desc">列表</p>
+    </div>
+    <div class="page__bd">
+        {volist name="cateres" id="vo"}
+        <div class="weui-cells__title">{$vo.catename}</div>
+        <div class="weui-cells">
+            {volist name="$vo.children" id="vo1"}
+            <a class="weui-cell weui-cell_access" href="javascript:;">
+                <div class="weui-cell__bd">
+                    <p>{$vo1.catename}</p>
+                </div>
+                <div class="weui-cell__ft">
+                </div>
+            </a>
+            {/volist}
+        </div>
+        {/volist}
+    </div>
+    <div class="page__ft">
+        <a href="javascript:home()"><img src="./images/icon_footer_link.png" /></a>
+    </div>
+</div>
+<script src="/static/mobile/js/zepto.min.js"></script>
+<!-- 点击底部变色 -->
+<script type="text/javascript">
+    $(function(){
+        $('.weui-tabbar__item').on('click', function () {
+            $(this).addClass('weui-bar__item_on').siblings('.weui-bar__item_on').removeClass('weui-bar__item_on');
+        });
+    });
+</script>
+
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link href="__ADMIN__/bootstrap/css/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" media="all" href="__HOME__/style/style.css" />
+    <link rel="stylesheet" href="__HOME__/style/pagenavi-css.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="__HOME__/style/votestyles.css" type="text/css" />
+    <link rel="stylesheet" href="__HOME__/style/voteitup.css" type="text/css" />
+
+    <!-- 引入uploadify条件 -->
+    <script type="text/javascript" src="__HOME__/style/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/uploadify/jquery.uploadify.min.js"></script>
+    <!-- layer -->
+    <script src="/layer/layer.js" type="text/javascript"></script>
+
+    <!-- 编辑器源码文件 -->
+    <script type="text/javascript" src="__ADMIN__/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="__ADMIN__/ueditor/ueditor.all.js"></script>
+    <script type="text/javascript" src="__ADMIN__/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <style type="text/css">
+        #wrapper
+        {
+            background-color: #ffffff;
+            padding:10px;
+            height:100%;
+            width:100%;
+        }
+        .single_entry{margin-top:30px;}
+    </style>
+<script type="text/javascript">
+$(function() {
+    // 上传图片
+    $('#file_upload').uploadify({
+        //指定swf文件
+        'swf' : '/uploadify/uploadify.swf',
+        //后台处理页面
+        'uploader' : "{:url('Article/upimg')}",
+        //设置上传进度显示方式，percentage显示上传百分比，speed显示上传速度
+        'progressData':'speed',
+        //设置按钮文本
+        'buttonText' : '上传图片',
+        'buttonClass':'btn btn-info btn-sm',
+        //只允许上传图像
+        'fileTypeDesc' : 'Image Files',
+        //限制允许上传的图片后缀
+        //'fileTypeExts' : '*.gif; *.jpg; *.png',
+        //限制上传的图片大小
+        // 'fileSizeLimit' : '2000KB',
+        //设定发送数据的name值
+        'fileObjName' : 'img',
+        //每次成功上传后执行的回调函数，从服务端返回数据到前端
+        'onUploadSuccess' : function(file, data, response) {
+            $("input[name='pic']").val(data);
+            var artimg = data;
+            var showart = "<img src='"+artimg+"' height='70' alt=''>";
+            $("#artimgdiv").show();//设置div可见
+            $("#artimg").html(showart);
+            layer.alert('上传成功！', {icon: 1});
+        }
+    });
+    $('#file_upload-button').prepend('<span class="glyphicon glyphicon-open"></span>&nbsp;');
+    $('#file_upload-button').removeAttr('style');//删除style防止css重复出错
+
+    // 撤销图片
+    $("#file_del").click(function(){
+        var img = $("#artimg").find('img');
+        var imgurl = img.attr('src');
+        if(!imgurl){
+            layer.alert('你还没有上传图片！', {icon: 2});
+        }else{
+            $("#artimgdiv").hide();//隐藏div
+            $("input[name='img']").val('');
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                data:{imgurl:imgurl},
+                url:"{:url('article/delimg')}",
+                success:function(data){
+                    if(data==1){
+                        layer.alert('撤销成功！', {icon: 1});
+                    }else{
+                        layer.alert('撤销失败！', {icon: 2});
+                    }
+                }
+            });
+        }
+    });
+
+});
+</script>
+</head>
+<body class="single2">
+{include file="public/head" /}
+<div id="wrapper" class="col-lg-12 col-sm-12 col-xs-1">
+<div><h2>投稿</h2></div>
+<div class="single_entry page_entry">
+<form class="form-horizontal" role="form" action="{:url('add')}" method="post" enctype="multipart/form-data">
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">文章作者</label>
+        <div class="col-sm-6">
+            <input class="form-control" id="catename" placeholder="" name="author" value="{$usermess.username}" required="" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">文章标题</label>
+        <div class="col-sm-6">
+            <input class="form-control" id="catename" placeholder="" name="title" required="" type="text">
+        </div>
+        <p class="help-block col-sm-4 red">* 必填</p>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">关键词</label>
+        <div class="col-sm-6">
+            <input class="form-control" id="catename" placeholder="" name="keywords" required="" type="text">
+        </div>
+        <p class="help-block col-sm-4 red">* 必填</p>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">描述</label>
+        <div class="col-sm-6">
+            <textarea name="des" id="" cols="20" required="" class="form-control"></textarea>
+        </div>
+        <p class="help-block col-sm-4 red">* 必填</p>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">缩略图</label>
+        <div class="col-sm-6">
+            <label>
+                <div id="file_upload"></div>
+                <input type="hidden" value="" name="pic" />
+            </label>
+            <label>
+                <div id="file_del" class="uploadify-button btn btn-info btn-sm">
+                <span class="glyphicon glyphicon-refresh"></span>
+                撤销上传</div>
+            </label>
+        </div>
+        <p class="help-block col-sm-4 red">* 必填</p>
+    </div>
+
+    <!-- display:none设置div不可见 -->
+    <div class="form-group" id="artimgdiv" style="display: none;">
+        <label for="username" class="col-sm-2 control-label no-padding-right"></label>
+        <div class="col-sm-6">
+            <label id="artimg"></label>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label for="username" class="col-sm-2 control-label no-padding-right">所属栏目</label>
+        <div class="col-sm-2">
+            <select name="cateid" style="height: 30px;">
+                {volist name="res" id="cate"}
+                <option value="{$cate.id}"><?php echo str_repeat('--------|',$cate['level'])?>{$cate.catename}</option>
+                {/volist}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="content" class="col-sm-2 control-label no-padding-right">内容</label>
+        <div class="col-sm-6">
+            <textarea name="content" id="content"></textarea>
+        </div>
+        <p class="help-block col-sm-4 red">* 必填</p>
+    </div>
+
+    <!-- 实例化编辑器 -->
+    <script type="text/javascript">
+        var editor = UE.getEditor('content',{initialFrameHeight:400,});
+    </script>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">发布信息</button>
+        </div>
+    </div>
+</form>
+</div>
+</div>
+{include file="public/footer" /}
+</body>
+</html>
